@@ -1,0 +1,243 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>For You ❤️</title><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet"><style>
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #ff758c, #ffb199);
+  color: white;
+  text-align: center;
+  overflow-x: hidden;
+}
+
+.screen {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.hidden { display: none; }
+
+button {
+  padding: 12px 22px;
+  border-radius: 25px;
+  border: none;
+  background: white;
+  color: #ff4d6d;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.balloon {
+  position: absolute;
+  bottom: -100px;
+  width: 50px;
+  height: 70px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.6;
+  animation: float 8s infinite ease-in;
+}
+
+@keyframes float {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-120vh); }
+}
+
+.gift {
+  width: 100px;
+  height: 100px;
+  margin: 10px;
+  display: inline-block;
+  background: url('https://cdn-icons-png.flaticon.com/512/3468/3468379.png') no-repeat center/contain;
+  opacity: 0.5;
+  pointer-events: none;
+  transition: 0.3s;
+}
+
+.gift.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.gift:hover { transform: scale(1.1); }
+
+.content-box {
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 15px;
+  max-width: 90%;
+}
+
+.typing {
+  border-right: 2px solid white;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.confetti {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  background: white;
+  top: 0;
+  animation: fall linear forwards;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+</style></head><body><div class="balloon" style="left:10%"></div>
+<div class="balloon" style="left:30%"></div>
+<div class="balloon" style="left:60%"></div>
+<div class="balloon" style="left:80%"></div><div id="intro" class="screen">
+  <h1>Hey you...</h1>
+  <p>I know things aren't exactly the same... but today is still yours.</p>
+  <button onclick="start()">Tap to open</button>
+</div><div id="lock" class="screen hidden">
+  <h2>Wait a little...</h2>
+  <p id="timer"></p>
+</div><div id="main" class="screen hidden">
+  <h2>Happy Birthday ❤️</h2>
+  <p>No matter what changed... this day is still yours.</p>  <div>
+    <div id="g1" class="gift active" onclick="openGift(1)"></div>
+    <div id="g2" class="gift" onclick="openGift(2)"></div>
+    <div id="g3" class="gift" onclick="openGift(3)"></div>
+    <div id="g4" class="gift" onclick="openGift(4)"></div>
+    <div id="g5" class="gift" onclick="openGift(5)"></div>
+  </div>  <div id="box" class="content-box"></div>
+</div><div id="final" class="screen hidden">
+  <h2>One last thing...</h2>
+  <p id="finalText" class="typing"></p>
+</div><audio id="bg" src="audio.mp3" loop></audio>
+
+<script>
+const birthday = new Date("2026-04-19T00:13:37").getTime();
+let opened = 0;
+
+function start() {
+  document.getElementById('intro').classList.add('hidden');
+  let now = new Date().getTime();
+
+  if (now < birthday) {
+    document.getElementById('lock').classList.remove('hidden');
+    setInterval(()=>{
+      let d = birthday - new Date().getTime();
+      document.getElementById('timer').innerHTML = "Almost there... " + Math.floor(d/1000) + "s";
+    },1000);
+  } else {
+    document.getElementById('main').classList.remove('hidden');
+    document.getElementById('bg').play().catch(()=>{});
+  }
+}
+
+function openGift(n) {
+  const box = document.getElementById('box');
+
+  if (n===1) {
+    box.innerHTML = "<h3>Hey...</h3><p>I know things changed... but you still matter to me.</p>";
+    unlock(2);
+  }
+
+  if (n===2) {
+    box.innerHTML = "<h3>Voice for you</h3><audio controls src='audio.mp3'></audio>";
+    unlock(3);
+  }
+
+  if (n===3) {
+    box.innerHTML = "<h3>Memory</h3><img src='image.jpg'><p>This one still makes me smile.</p>";
+    unlock(4);
+  }
+
+  if (n===5) {
+    box.innerHTML = "<h3>A little video</h3><video controls src='video.mp4'></video>";
+    opened++;
+    showFinal();
+  }
+}
+
+function unlock(n) {
+  document.getElementById('g'+n).classList.add('active');
+  opened++;
+}
+
+function typeText(text, element, i=0) {
+  if (i < text.length) {
+    element.innerHTML += text.charAt(i);
+    setTimeout(()=>typeText(text, element, i+1), 40);
+  }
+}
+
+function showFinal() {
+  if (opened >= 3) {
+    setTimeout(()=>{
+      document.getElementById('main').classList.add('hidden');
+      document.getElementById('final').classList.remove('hidden');
+
+      const msg = "No matter where we stand... I just hope today makes you smile. That's all I really wanted. ❤️";
+      const el = document.getElementById('finalText');
+      el.innerHTML = "";
+      typeText(msg, el);
+
+      launchConfetti();
+    },2000);
+  }
+}
+
+function launchConfetti() {
+  for (let i = 0; i < 50; i++) {
+    let c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = Math.random()*100 + 'vw';
+    c.style.animationDuration = (2 + Math.random()*3) + 's';
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),4000);
+  }
+}
+</script><!-- Secret Tap Area --><div id="secretArea" style="position:fixed; bottom:10px; right:10px; width:40px; height:40px; opacity:0;"></div><!-- Secret Message --><div id="secretMessage" class="screen hidden">
+  <h2>Hey...</h2>
+  <p id="secretText"></p>
+</div><script>
+// Secret tap logic
+let tapped = false;
+document.getElementById('secretArea').addEventListener('click', ()=>{
+  if(!tapped){
+    tapped = true;
+    document.getElementById('main').classList.add('hidden');
+    document.getElementById('final').classList.add('hidden');
+    document.getElementById('secretMessage').classList.remove('hidden');
+
+    const msg = "I didn't plan to say this... but a part of me still cares more than it should. Just... don't forget me completely, okay? ❤️";
+    const el = document.getElementById('secretText');
+    el.innerHTML = "";
+    typeText(msg, el);
+  }
+});
+</script><!-- Personal Final Note --><div id="personal" class="screen hidden">
+  <h2>Just one more thing...</h2>
+  <p style="max-width:90%; font-size:18px;">
+    <!-- baby i love u pls be happy in your life even without me it is supposed to be ur birthday no matter what ill still love u ill wait for u -->
+    (bby pls mojha maaf kardeena kbhi hoo paaya toh but i was hurt but mojha umid nhi ki tu smjha ya kuch kha u will always be special for me even yss banakar tera yaad araha tha kys karu but tu syd mojha bhul hi gya hooga but pls bhulnaa thora time leekar itna jldi mt bhuljana bye or cll ka baad or sure hogya)
+  </p>
+</div><script>
+// Show personal message after final
+setTimeout(()=>{
+  const finalScreen = document.getElementById('final');
+  if(finalScreen){
+    finalScreen.addEventListener('click', ()=>{
+      finalScreen.classList.add('hidden');
+      document.getElementById('personal').classList.remove('hidden');
+    });
+  }
+},1000);
+</script></body>
+</html>
